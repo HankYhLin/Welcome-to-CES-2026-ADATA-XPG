@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CES 2026</title>
+    <title>CES 2026 - ADATA XPG</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Anton&family=Roboto:wght@900&display=swap" rel="stylesheet">
 
     <style>
-        /* 載入您的自備字體 (請確保 meatball.ttf 放在 HTML 旁) */
         @font-face {
             font-family: 'Super Meatball';
             src: url('meatball.ttf') format('truetype'); 
@@ -23,7 +22,6 @@
             height: 100vh; overflow: hidden; 
         }
         
-        /* 600x600 限制容器 */
         #marquee-container { 
             width: 600px; height: 600px; 
             background-color: black; 
@@ -32,17 +30,16 @@
             box-shadow: 0 0 50px rgba(0,0,0,0.8);
         }
         
-        /* 無縫包裝層 */
         .marquee-wrapper {
             display: flex;
             white-space: nowrap;
             position: absolute;
             top: 40%;
             width: max-content;
-            animation: seamless-scroll 10s linear infinite;
+            /* 預設動畫速度 */
+            animation: seamless-scroll 14s linear infinite; 
         }
 
-        /* 跑馬燈主體 - 指定五色 RGB */
         .marquee-text { 
             font-weight: bold; 
             background: linear-gradient(to right, 
@@ -51,10 +48,9 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: rgb-flow 3s linear infinite;
-            padding-right: 100px; 
+            padding-right: 150px; /* 增加間距，讓長文字對接更美觀 */
         }
 
-        /* 底部常駐資訊 */
         #footer-info {
             position: absolute; bottom: 35px; width: 100%; text-align: center;
             color: #777; font-family: 'Roboto', sans-serif; font-size: 18px;
@@ -62,7 +58,6 @@
             border-top: 1px solid #222; padding-top: 18px;
         }
         
-        /* 設定面板 */
         #settings-panel { 
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background: white; padding: 25px; border-radius: 15px; z-index: 1000; 
@@ -106,13 +101,13 @@
         </div>
 
         <div class="setting-item">
-            <label>選擇字體 (Google 商用授權)：</label>
+            <label>選擇字體：</label>
             <select id="font-family-select">
-                <option value="'Orbitron', sans-serif">Orbitron </option>
-                <option value="'Anton', sans-serif">Anton </option>
-                <option value="'Roboto', sans-serif">Roboto </option>
-                <option value="'Super Meatball'">Super Meatball </option>
-                <option value="'Arial Black', sans-serif">Arial Black </option>
+                <option value="'Orbitron', sans-serif">Orbitron</option>
+                <option value="'Anton', sans-serif">Anton</option>
+                <option value="'Roboto', sans-serif">Roboto</option>
+                <option value="'Super Meatball'">Super Meatball</option>
+                <option value="'Arial Black', sans-serif">Arial Black</option>
             </select>
         </div>
 
@@ -152,15 +147,20 @@
             });
 
             document.getElementById('size-val').textContent = fontSize.value;
-            const scrollDuration = 21 - speedInput.value;
+            
+            // 修正：計算滾動持續時間 (秒數越小速度越快)
+            const scrollDuration = 21 - parseInt(speedInput.value);
             wrapper.style.animationDuration = `${scrollDuration}s`;
         }
 
         document.getElementById('marquee-container').addEventListener('click', (e) => {
-            if (e.target !== panel && !panel.contains(e.target)) panel.style.display = 'block';
+            if (panel.style.display !== 'block') {
+                panel.style.display = 'block';
+            }
         });
         
-        document.getElementById('close-btn').addEventListener('click', () => {
+        document.getElementById('close-btn').addEventListener('click', (e) => {
+            e.stopPropagation(); // 防止觸發容器的點擊事件
             panel.style.display = 'none';
         });
 
@@ -168,9 +168,8 @@
             el.addEventListener('input', update);
         });
 
+        // 初始化更新一次
         update();
     </script>
 </body>
 </html>
-
-
