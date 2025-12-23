@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CES 2026 - Professional RGB Marquee</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Anton&family=Roboto:wght@900&display=swap" rel="stylesheet">
+
+    <style>
+        /* 載入您的自備字體 (請確保 meatball.ttf 放在 HTML 旁) */
+        @font-face {
+            font-family: 'Super Meatball';
+            src: url('meatball.ttf') format('truetype'); 
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body { 
+            margin: 0; padding: 0; 
+            background-color: #111; 
+            display: flex; justify-content: center; align-items: center; 
+            height: 100vh; overflow: hidden; 
+        }
+        
+        /* 600x600 限制容器 */
+        #marquee-container { 
+            width: 600px; height: 600px; 
+            background-color: black; 
+            position: relative; cursor: pointer; 
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+        
+        /* 無縫包裝層 */
+        .marquee-wrapper {
+            display: flex;
+            white-space: nowrap;
+            position: absolute;
+            top: 40%;
+            width: max-content;
+            animation: seamless-scroll 10s linear infinite;
+        }
+
+        /* 跑馬燈主體 - 指定五色 RGB */
+        .marquee-text { 
+            font-weight: bold; 
+            background: linear-gradient(to right, 
+                #FF585D, #9063CD, #71CC98, #EF426F, #69B3E7, #FF585D);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rgb-flow 3s linear infinite;
+            padding-right: 100px; 
+        }
+
+        /* 底部常駐資訊 */
+        #footer-info {
+            position: absolute; bottom: 35px; width: 100%; text-align: center;
+            color: #777; font-family: 'Roboto', sans-serif; font-size: 18px;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            border-top: 1px solid #222; padding-top: 18px;
+        }
+        
+        /* 設定面板 */
+        #settings-panel { 
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; padding: 25px; border-radius: 15px; z-index: 1000; 
+            display: none; width: 320px; color: #333; font-family: sans-serif;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+        }
+        .setting-item { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; color: #666; }
+        input[type="text"], input[type="range"], select { 
+            width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid #ddd; border-radius: 6px;
+        }
+        button { 
+            width: 100%; padding: 12px; margin-top: 10px; cursor: pointer; border: none; 
+            background: #FF585D; color: white; border-radius: 8px; font-weight: bold;
+        }
+
+        @keyframes seamless-scroll {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        @keyframes rgb-flow {
+            to { background-position: 200% center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="marquee-container">
+        <div class="marquee-wrapper" id="marquee-wrapper">
+            <div class="marquee-text" id="m1">Welcome to CES 2026</div>
+            <div class="marquee-text" id="m2">Welcome to CES 2026</div>
+        </div>
+        <div id="footer-info">Venetian, Titian ballroom, Booth #2204</div>
+    </div>
+
+    <div id="settings-panel">
+        <div class="setting-item">
+            <label>跑馬燈文字：</label>
+            <input type="text" id="text-input" value="Welcome to CES 2026">
+        </div>
+
+        <div class="setting-item">
+            <label>選擇字體 (Google 商用授權)：</label>
+            <select id="font-family-select">
+                <option value="'Orbitron', sans-serif">Orbitron (科技感 - 建議)</option>
+                <option value="'Anton', sans-serif">Anton (粗壯有力)</option>
+                <option value="'Roboto', sans-serif">Roboto (現代簡潔)</option>
+                <option value="'Super Meatball'">Super Meatball (自備字體)</option>
+                <option value="'Arial Black', sans-serif">Arial Black (系統內建)</option>
+            </select>
+        </div>
+
+        <div class="setting-item">
+            <label>字體大小 (<span id="size-val">120</span>px)：</label>
+            <input type="range" id="font-size" min="30" max="300" value="120">
+        </div>
+
+        <div class="setting-item">
+            <label>滾動速度：</label>
+            <input type="range" id="speed" min="1" max="20" value="10">
+        </div>
+
+        <button id="close-btn">確認並儲存</button>
+    </div>
+
+    <script>
+        const wrapper = document.getElementById('marquee-wrapper');
+        const m1 = document.getElementById('m1');
+        const m2 = document.getElementById('m2');
+        const panel = document.getElementById('settings-panel');
+        
+        const textInput = document.getElementById('text-input');
+        const fontFamilySelect = document.getElementById('font-family-select');
+        const fontSize = document.getElementById('font-size');
+        const speedInput = document.getElementById('speed');
+
+        function update() {
+            const val = textInput.value;
+            const size = fontSize.value + 'px';
+            const selectedFont = fontFamilySelect.value;
+
+            [m1, m2].forEach(m => {
+                m.textContent = val;
+                m.style.fontSize = size;
+                m.style.fontFamily = selectedFont;
+            });
+
+            document.getElementById('size-val').textContent = fontSize.value;
+            const scrollDuration = 21 - speedInput.value;
+            wrapper.style.animationDuration = `${scrollDuration}s`;
+        }
+
+        document.getElementById('marquee-container').addEventListener('click', (e) => {
+            if (e.target !== panel && !panel.contains(e.target)) panel.style.display = 'block';
+        });
+        
+        document.getElementById('close-btn').addEventListener('click', () => {
+            panel.style.display = 'none';
+        });
+
+        [textInput, fontFamilySelect, fontSize, speedInput].forEach(el => {
+            el.addEventListener('input', update);
+        });
+
+        update();
+    </script>
+</body>
+</html>
