@@ -2,153 +2,133 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CES 2026 - 5s Fast Pass</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CES 2026 - Mobile & Video Sync</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Orbitron:wght@900&family=Roboto:wght@900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:wght@900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/ccapture.js@1.1.0/build/CCapture.all.min.js"></script>
 
     <style>
-        @font-face {
-            font-family: 'Super Meatball';
-            src: url('meatball.ttf') format('truetype'); 
-            font-weight: normal;
-        }
-
         body { 
             margin: 0; padding: 0; 
-            background-color: #111; 
-            display: flex; justify-content: center; align-items: center; 
+            background-color: #000; /* 手機端建議純黑，避免縮放留白 */
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
             height: 100vh; overflow: hidden; 
         }
         
+        /* 核心容器 */
         #marquee-container { 
             width: 720px; height: 720px; 
             background-color: black; 
-            position: relative; cursor: pointer; 
-            overflow: hidden;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8);
-            border: 1px solid #333;
-            display: flex;
-            align-items: center;
+            position: relative; overflow: hidden;
+            display: flex; align-items: center;
+            border: 1px solid #222;
+            flex-shrink: 0; /* 防止被 flex 壓縮 */
         }
         
+        /* 手機適配：當螢幕寬度小於 720px 時自動縮放 */
+        @media (max-width: 720px) {
+            #marquee-container {
+                transform: scale(calc(100vw / 720));
+                transform-origin: center center;
+            }
+        }
+
         .marquee-wrapper {
-            display: flex;
-            width: max-content;
-            position: absolute;
-            will-change: transform;
-            backface-visibility: hidden;
-            transform: translateX(720px);
-            /* 動畫時間改為 5s */
-            animation: fast-pass-scroll 5s linear 0.5s 1 forwards;
+            display: flex; width: max-content; position: absolute;
+            will-change: transform; transform: translateX(720px);
         }
 
         .marquee-text { 
-            font-weight: bold; 
-            font-family: 'Anton', sans-serif;
+            font-weight: bold; font-family: 'Anton', sans-serif; font-size: 150px;
             background: linear-gradient(to right, #FF585D, #9063CD, #71CC98, #EF426F, #69B3E7, #FF585D);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: rgb-flow 3s linear infinite;
-            white-space: nowrap;
-            padding: 0; 
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: rgb-flow 3s linear infinite; white-space: nowrap;
         }
 
         #footer-info {
             position: absolute; bottom: 40px; width: 100%; text-align: center;
             color: #777; font-family: 'Roboto', sans-serif; font-size: 20px;
-            letter-spacing: 2px; text-transform: uppercase;
-            border-top: 1px solid #222; padding-top: 20px;
-        }
-        
-        #settings-panel { 
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: white; padding: 25px; border-radius: 15px; z-index: 1000; 
-            display: none; width: 320px; color: #333; font-family: sans-serif;
-            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+            letter-spacing: 2px; text-transform: uppercase; border-top: 1px solid #222; padding-top: 20px;
         }
 
-        /* 5秒跑完全程：從 720px 到 -100% */
+        /* 錄影按鈕：手機上會自動隱藏，避免遮擋 */
+        #export-btn {
+            position: fixed; bottom: 20px; padding: 12px 24px; 
+            background: rgba(0, 122, 255, 0.8); color: white;
+            border: none; border-radius: 50px; cursor: pointer; font-weight: bold;
+            z-index: 100; backdrop-filter: blur(5px);
+        }
+        
+        @media (max-height: 500px) { #export-btn { display: none; } } /* 橫向模式隱藏按鈕 */
+
         @keyframes fast-pass-scroll {
             from { transform: translateX(720px); }
             to { transform: translateX(-100%); } 
         }
 
-        @keyframes rgb-flow {
-            to { background-position: 200% center; }
-        }
+        @keyframes rgb-flow { to { background-position: 200% center; } }
     </style>
 </head>
 <body>
 
     <div id="marquee-container">
         <div class="marquee-wrapper" id="marquee-wrapper">
-            <div class="marquee-text" id="m1">Welcome to CES 2026 @ ADATA | XPG</div>
+            <div class="marquee-text">Welcome to CES 2026 @ ADATA | XPG</div>
         </div>
         <div id="footer-info">Venetian, Titian ballroom, Booth #2204</div>
     </div>
 
-    <div id="settings-panel">
-        <div class="setting-item">
-            <label>跑馬燈文字：</label>
-            <input type="text" id="text-input" value="Welcome to CES 2026 @ ADATA | XPG">
-        </div>
-        <div class="setting-item">
-            <label>選擇字體：</label>
-            <select id="font-family-select">
-                <option value="'Anton', sans-serif" selected>Anton</option>
-                <option value="'Orbitron', sans-serif">Orbitron</option>
-                <option value="'Roboto', sans-serif">Roboto</option>
-                <option value="'Super Meatball'">Super Meatball</option>
-            </select>
-        </div>
-        <div class="setting-item">
-            <label>字體大小 (<span id="size-val">150</span>px)：</label>
-            <input type="range" id="font-size" min="50" max="400" value="150">
-        </div>
-        <button id="close-btn">確認並重新播放</button>
-    </div>
+    <button id="export-btn">開始無損錄製 (6秒)</button>
 
     <script>
         const wrapper = document.getElementById('marquee-wrapper');
-        const m1 = document.getElementById('m1');
-        const panel = document.getElementById('settings-panel');
-        const textInput = document.getElementById('text-input');
-        const fontSize = document.getElementById('font-size');
-        const fontFamilySelect = document.getElementById('font-family-select');
+        const btn = document.getElementById('export-btn');
+        const container = document.getElementById('marquee-container');
 
-        function update() {
-            m1.textContent = textInput.value;
-            m1.style.fontFamily = fontFamilySelect.value;
-            m1.style.fontSize = fontSize.value + 'px';
-            document.getElementById('size-val').textContent = fontSize.value;
+        const capturer = new CCapture({
+            format: 'webm',
+            framerate: 60,
+            verbose: false
+        });
+
+        let isRecording = false;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if (isRecording) {
+                capturer.capture(container);
+            }
+        }
+        animate();
+
+        // 點擊容器也可以在手機上重播動畫
+        container.onclick = () => {
+            wrapper.style.animation = 'none';
+            wrapper.offsetHeight;
+            wrapper.style.animation = `fast-pass-scroll 5s linear 0.5s 1 forwards`;
+        };
+
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            btn.disabled = true;
+            btn.innerText = "錄製中...";
+            
+            isRecording = true;
+            capturer.start();
             
             wrapper.style.animation = 'none';
-            
-            window.requestAnimationFrame(() => {
-                window.requestAnimationFrame(() => {
-                    // 固定 5 秒播放
-                    wrapper.style.animation = `fast-pass-scroll 5s linear 0.5s 1 forwards`;
-                });
-            });
-        }
+            wrapper.offsetHeight;
+            wrapper.style.animation = `fast-pass-scroll 5s linear 0.5s 1 forwards`;
 
-        document.getElementById('marquee-container').addEventListener('click', (e) => {
-            if (e.target !== panel && !panel.contains(e.target)) panel.style.display = 'block';
-        });
-        
-        document.getElementById('close-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            panel.style.display = 'none';
-            update();
-        });
-
-        [textInput, fontSize, fontFamilySelect].forEach(el => {
-            el.addEventListener('input', update);
-        });
-
-        update();
+            setTimeout(() => {
+                isRecording = false;
+                capturer.stop();
+                capturer.save();
+                btn.disabled = false;
+                btn.innerText = "開始無損錄製 (6秒)";
+            }, 6000);
+        };
     </script>
 </body>
 </html>
